@@ -485,39 +485,35 @@ in this repository for reference implementation.
 Let's create following topology in K8s:
 
 ```txt
-[WebAPI - ReplicaSet, 3 Instances] - [WebAPI - Service] - [Client - ReplicaSet, 5 Instances]
+[WebAPI - Deployment, 3 Instances] - [WebAPI - Service] - [Client - Deployment, 5 Instances]
 ```
 
-- We will have ReplicaSet running 3 instances of our `WebApi`
-- On top of the ReplicaSet, we will have a Service that will provide
+- We will have Deployment running 3 instances of our `WebApi`
+- On top of the Deployment, we will have a Service that will provide
   a stable IP address and simple load balancing
-- We will have one instance of `Client` sending requests to `Service`
-  (effectively, to any of our three `WebApi` instances)
+- We will have Deployment running 5 instances of `Client` sending requests
+  to `Service` (effectively, to any of our three `WebApi` instances)
 
-#### WebAPI - ReplicaSet
+#### WebAPI - Deployment
 
-Create manifest for the ReplicaSet in `k8s\webapi-rs.yml`:
+Create manifest for the WebAPI Deployment in `k8s\webapi-deployment.yml`:
 
 ```yaml
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: containersdemo-webapi-rs
+  name: containersdemo-webapi-deployment
   labels:
     app: containersdemo-webapi
-    tier: backend
 spec:
   replicas: 3
   selector:
     matchLabels:
-      tier: backend
-    matchExpressions:
-      - {key: tier, operator: In, values: [backend]}
+      app: containersdemo-webapi
   template:
     metadata:
       labels:
         app: containersdemo-webapi
-        tier: backend
     spec:
       containers:
       - name: containersdemo-webapi-ctr
@@ -526,36 +522,36 @@ spec:
         - containerPort: 5000
 ```
 
-Create the ReplicaSet:
+Create the Deployment:
 
 ```cmd
-kubectl create -f .\webapi-rs.yml
+kubectl create -f .\webapi-deployment.yml
 ```
 
-Verify that ReplicaSet was created:
+Verify that Deployment was created:
 
 ```cmd
-kubectl get rs/containersdemo-webapi-rs
+kubectl get deploy/containersdemo-webapi-deployment
 ```
 
 Expected output is
 
 ```txt
-NAME                       DESIRED   CURRENT   READY     AGE
-containersdemo-webapi-rs   3         3         3         ???
+NAME                               DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+containersdemo-webapi-deployment   3         3         3            3           ???
 ```
 
 Desired and actual instance count should match one from the manifest (3).
 
 #### WebAPI - Service
 
-Create manifest for the Service in `k8s\webapi-svc.yml`:
+Create manifest for the WebAPI Service in `k8s\webapi-service.yml`:
 
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: containersdemo-webapi-svc
+  name: containersdemo-webapi-service
   labels:
     app: containersdemo-webapi
 spec:
@@ -571,70 +567,67 @@ spec:
 Create the Service:
 
 ```cmd
-kubectl create -f .\webapi-svc.yml
+kubectl create -f .\webapi-service.yml
 ```
 
 Verify that Service was created:
 
 ```cmd
-kubectl get svc/containersdemo-webapi-svc
+kubectl get svc/containersdemo-webapi-service
 ```
 
 Expected output is
 
 ```txt
-NAME                        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-containersdemo-webapi-svc   NodePort   10.101.88.198   <none>        5000:31319/TCP   ???
+NAME                            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+containersdemo-webapi-service   NodePort   10.101.88.198   <none>        5000:31319/TCP   ???
 ```
 
 Desired and actual instance count should match one from the manifest (3).
 
-#### Client - ReplicaSet
+#### Client - Deployment
 
-Create manifest for the ReplicaSet in `k8s\client-rs.yml`:
+Create manifest for the Clinet Deployment  in `k8s\client-deployment.yml`:
 
 ```yaml
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: containersdemo-client-rs
+  name: containersdemo-client-deployment
   labels:
     app: containersdemo-client
-    tier: frontend
 spec:
   replicas: 5
   selector:
     matchLabels:
       app: containersdemo-client
-      tier: frontend
   template:
     metadata:
       labels:
         app: containersdemo-client
-        tier: frontend
     spec:
       containers:
       - name: containersdemo-client-ctr
         image: containers-demo/client:develop
 ```
 
-Create the ReplicaSet:
+Create the Deployment:
 
 ```cmd
-kubectl create -f .\client-rs.yml
+kubectl create -f .\client-deployment.yml
 ```
 
 Verify that ReplicaSet was created:
 
 ```cmd
-kubectl get rs/containersdemo-client-rs
+kubectl get deploy/containersdemo-client-deployment
 ```
 
 Expected output is
 
 ```txt
-NAME                       DESIRED   CURRENT   READY     AGE
-containersdemo-clieint-rs  5         5         5         ???
+NAME                               DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+containersdemo-client-deployment   5         5         5            5           ???
 ```
 
-Desired and actual instance count should match one from the manifest (5).
+Desired and available instance count should match one from the manifest (5).
