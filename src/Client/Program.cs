@@ -4,12 +4,16 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
-
+using Client.Random;
+using Microsoft.Diagnostics.EventFlow;
 using Microsoft.Extensions.Configuration;
+using static System.Diagnostics.Trace;
 
-namespace Client.Random
+namespace Client
 {
-    class Program
+    using System.Reflection;
+
+    internal static class Program
     {
         private static readonly Command[] allCommands;
         private static string id;
@@ -20,47 +24,53 @@ namespace Client.Random
             foreach (var c in Enum.GetValues(typeof(Command)))
             {
                 list.Add((Command)c);
-            };
+            }
 
-            allCommands = list.ToArray();
+            allCommands =  list.ToArray();
         }
 
-        static void Main(string[] args)
+        private static void Main()
         {
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-
-            var configuration = configurationBuilder.Build();
-            Func<string, string> settingsResolver = (name) => configuration[name];
-
-            var apiUrl = settingsResolver("ApiUrl");
-            var maxDelay = TimeSpan.Parse(settingsResolver("MaxDelay"));
-            var maxDelayMs = (int)maxDelay.TotalMilliseconds;
-            var rnd = new System.Random();
-
-            Console.WriteLine($"REST API Random Test Client. API Url: {apiUrl}");
-            var apiClient = new HttpClient();
-
-            while (true)
+            using(DiagnosticPipelineFactory.CreatePipeline("eventFlowConfig.json"))
             {
-                var c = GetRandomCommand();
-                Console.WriteLine($"Processing command {c}");
+                var configurationBuilder = new ConfigurationBuilder()
+                    .SetBasePath(AssemblyDirectory)
+                    .AddJsonFile("appsettings.json");
 
-                var request = GetRequest(c, apiUrl);
-                try
+                var configuration = configurationBuilder.Build();
+                string SettingsResolver(string name) => configuration[name];
+                
+                var apiUrl = SettingsResolver("ApiUrl");
+                var maxDelay = TimeSpan.Parse(SettingsResolver("MaxDelay"));
+                var maxDelayMs = (int)maxDelay.TotalMilliseconds;
+                
+                var rnd = new System.Random();
+
+                TraceInformation($"REST API Random Test Client. API Url: {apiUrl}");
+                
+                var apiClient = new HttpClient();
+                
+                while (true)
                 {
-                    Console.WriteLine($"{request.Method} {request.RequestUri}");
-                    var response = apiClient.SendAsync(request).Result;
-                    Console.WriteLine($"{response.StatusCode}");
+                    var c = GetRandomCommand();
+                    TraceInformation($"Processing command {c}");
+                    var request = GetRequest(c, apiUrl);
+                    try
+                    {
+                        TraceInformation($"{request.Method} {request.RequestUri}");
+                        var response = apiClient.SendAsync(request).Result;                        
+                        TraceResponse(response, request.Method, request.RequestUri);
                     
-                    Thread.Sleep(rnd.Next(maxDelayMs));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to process command {c}: {ex.Message}");
+                        Thread.Sleep(rnd.Next(maxDelayMs));                        
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceError($"Failed to process command {c}: {ex.Message}");                        
+                    }                    
                 }
             }
+
+            // ReSharper disable once FunctionNeverReturns
         }
 
         private static HttpRequestMessage GetRequest(Command c, string apiUrl)
@@ -90,7 +100,7 @@ namespace Client.Random
                     break;
 
                 default:
-                    Console.WriteLine($"Command {c} not supported");
+                    TraceError($"Command {c} not supported");
                     request = new HttpRequestMessage(HttpMethod.Options, $"{apiUrl}");
                     break;
             }
@@ -98,12 +108,23 @@ namespace Client.Random
             return request;
         }
 
-        private static void PrintResponse(HttpResponseMessage response, HttpMethod method, Uri requestUri)
+        private static void TraceResponse(HttpResponseMessage response, HttpMethod method, Uri requestUri)
         {
-            Console.WriteLine("");
-            Console.WriteLine($"RESPONSE ({method} {requestUri}):");
-            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-            Console.WriteLine("");
+            var statusCode = response.StatusCode;
+            var content = response.Content.ReadAsStringAsync().Result;
+            TraceInformation($"RESPONSE ({method} {requestUri}): {statusCode} {content}");
+        }
+
+        private static string AssemblyDirectory
+        {
+            get
+            {
+                var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                var uri = new UriBuilder(codeBase);
+                var path = Uri.UnescapeDataString(uri.Path);
+                
+                return Path.GetDirectoryName(path);
+            }
         }
 
         private static Command GetRandomCommand()
@@ -128,6 +149,7 @@ namespace Client.Random
                         if (string.IsNullOrEmpty(id)) c = null;
                         break;
 
+                    // ReSharper disable once RedundantEmptySwitchSection
                     default:
                         break;
                 }

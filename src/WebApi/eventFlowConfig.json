@@ -1,0 +1,13 @@
+{
+    "inputs": [
+    {
+      "type": "Trace",
+      "traceLevel": "Information"
+    }
+  ],
+  "outputs": [
+    {
+        "type": "StdOutput"
+    }],
+  "schemaVersion": "2016-08-11"
+}
