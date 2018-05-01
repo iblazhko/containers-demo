@@ -363,7 +363,6 @@ Add `Client\Dockerfile` file to define content of the API container.
 FROM microsoft/dotnet:2.0-runtime
 WORKDIR /app
 COPY _publish .
-COPY appsettings.json .
 ENTRYPOINT ["dotnet", "Client.dll"]
 ```
 
