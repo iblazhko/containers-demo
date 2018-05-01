@@ -10,6 +10,10 @@
     <PackageReference Include="Microsoft.Diagnostics.EventFlow" Version="1.1.0" />
     <PackageReference Include="Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch" Version="2.4.0" />
     <PackageReference Include="Microsoft.Diagnostics.EventFlow.Outputs.StdOutput" Version="1.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.6.0" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />

@@ -1,26 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using static System.Diagnostics.Trace;
 
 namespace WebApi.Controllers
 {
-    using System.Linq;
-
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
         private static readonly Dictionary<string, string> repository = new Dictionary<string, string>();
+        private readonly MongoClient mongoClient;
+        private readonly IMongoDatabase db;
 
+        public ValuesController()
+        {
+            var mongoClientSettings = new MongoClientSettings();
+            mongoClient = new MongoClient(mongoClientSettings);
+            db = mongoClient.GetDatabase(MongoDbConfiguration.DatabaseName);
+
+            var c = db.GetCollection<IdValuePairType>("values");
+            if (c == null)
+            {
+                db.CreateCollection("values");
+            }
+        }
         // GET api/values
         [HttpGet]
-        public IdValuePairType[] Get()
+        public IEnumerable<IdValuePairType> Get()
         {
-            TraceInformation("GET All");
+            TraceInformation("GET All"); 
             
-            return repository
-                .Select(kvp => new IdValuePairType(kvp.Key, kvp.Value))
-                .ToArray();
+            var c = db.GetCollection<IdValuePairType>("values");
+            return c.Find(Builders<IdValuePairType>.Filter.Empty).ToList();
         }
 
         // GET api/values/5
@@ -28,8 +41,8 @@ namespace WebApi.Controllers
         public IdValuePairType Get(string id)
         {
             TraceInformation($"GET {id}");
-
-            return repository.ContainsKey(id) ? new IdValuePairType(id, repository[id]) : null;
+            var c = db.GetCollection<IdValuePairType>("values");
+            return c.Find(Builders<IdValuePairType>.Filter.Eq(x => x.id, id)).FirstOrDefault();
         }
 
         // POST api/values
@@ -37,17 +50,21 @@ namespace WebApi.Controllers
         public void Post([FromBody]ValueType valueEnvelope)
         {
             var id = Guid.NewGuid().ToString();
-            TraceInformation($"POST {id}");
-            repository.Add(id, valueEnvelope.value);
+            var v = valueEnvelope?.value;
+            TraceInformation($"POST {id} {v}");
+            var c = db.GetCollection<IdValuePairType>("values");
+            var d = new IdValuePairType(id, v);
+            c.InsertOne(d);
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
         public void Put(string id, [FromBody]ValueType valueEnvelope)
         {
-            TraceInformation($"PUT {id}");
-            if (repository.ContainsKey(id))
-                repository[id] = valueEnvelope.value;
+            var v = valueEnvelope?.value;
+            TraceInformation($"PUT {id} {v}");
+            var c = db.GetCollection<IdValuePairType>("values");
+            c.UpdateOne(Builders<IdValuePairType>.Filter.Eq(x => x.id, id), Builders<IdValuePairType>.Update.Set(x => x.value, v));
         }
 
         // DELETE api/values/5
@@ -55,8 +72,8 @@ namespace WebApi.Controllers
         public void Delete(string id)
         {
             TraceInformation($"DELETE {id}");
-            if (repository.ContainsKey(id))
-                repository.Remove(id);
+            var c = db.GetCollection<IdValuePairType>("values");
+            c.DeleteOne(Builders<IdValuePairType>.Filter.Eq(x => x.id, id));
         }
 
         public class ValueType

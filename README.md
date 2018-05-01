@@ -348,3 +348,44 @@ and run commands
 
 See tag [Step_03_2](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_2 "Step_03_2")
 in this repository for reference implementation.
+
+### Step 3.3 MongoDb
+
+In this step, we will add another Docker container to our system, to run
+MongoDb server, and will modify API implementation to store values
+in the database.
+
+    docker run --name containersdemo-mongo -d mongo:latest
+
+Note that MongoDb .NET driver is compatible with `netstandard1.5` or higher.
+Check `TargetFramework` in project files to make sure that they
+meet this requirement:
+
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+Modify API implementation to use database instead of in-memory dictionary.
+
+    cd <project directory>\src
+
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.CommandLine
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.Json
+    dotnet add .\WebApi\WebApi.csproj package MongoDB.Driver
+
+In `<project directory>\src\WebApi\appsettings.json` add settings for MongoDb:
+
+    {
+      "MongoDb.ServerAddress": "localhost",
+      "MongoDb.ServerPort": "27017",
+      "MongoDb.DatabaseName": "containersdemo",
+      "MongoDb.UserName": "",
+      "MongoDb.UserPassword": ""
+    }
+
+Modify `<project directory>\src\WebApi\Startup.cs`
+to read MongoDb settings, and
+`<project directory>\src\WebApi\Controllers\ValuesController.cs`
+to use MongoDb database.
+
+See tag [Step_03_3](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_3 "Step_03_3")
+in this repository for reference implementation.

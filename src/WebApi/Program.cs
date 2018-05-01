@@ -23,6 +23,12 @@ namespace WebApi
 
             var apiUrl = SettingsResolver("ApiUrl");
 
+            MongoDbConfiguration.ServerAddress = SettingsResolver("MongoDb.ServerAddress");
+            MongoDbConfiguration.ServerPort = int.Parse(SettingsResolver("MongoDb.ServerPort"));
+            MongoDbConfiguration.DatabaseName = SettingsResolver("MongoDb.DatabaseName");
+            MongoDbConfiguration.UserName = SettingsResolver("MongoDb.UserName");
+            MongoDbConfiguration.UserPassword = SettingsResolver("MongoDb.UserPassword");
+            
             using(DiagnosticPipelineFactory.CreatePipeline("eventFlowConfig.json"))
             {
                 var host = new WebHostBuilder()
