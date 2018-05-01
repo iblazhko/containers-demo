@@ -9,9 +9,8 @@ spec:
   replicas: 3
   selector:
     matchLabels:
+      app: containersdemo-webapi
       tier: backend
-    matchExpressions:
-      - {key: tier, operator: In, values: [backend]}
   template:
     metadata:
       labels:
