@@ -221,3 +221,26 @@ You should see that the client is sending random commands, e.g.
     DELETE http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
 
 See tag [Step_02_2](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_2 "Step_02_2") in this repository for reference implementation.
+
+### Step 2.3 Logging
+
+To ensure that system activity is logged consistently, add logging implementation
+to `Infrastracture.Logging`; modify `WebApi` and `Client` projects to use that
+implementation and log activity to console.
+
+This repository uses [Microsoft.Diagnostics.EventFlow](https://github.com/Azure/diagnostics-eventflow/ "Microsoft.Diagnostics.EventFlow")
+as underlying implementation.
+
+    dotnet add .\Infrastructure.Logging\Infrastructure.Logging.csproj package Microsoft.Diagnostics.EventFlow
+
+    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow
+    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
+    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+
+In later steps we will add [ElasticSearch sink](https://github.com/serilog/serilog-sinks-elasticsearch "ElasticSearch sink") to send logs to centralized storage.
+
+See tag [Step_02_3](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_3 "Step_02_3") in this repository for reference implementation.
