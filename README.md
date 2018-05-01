@@ -318,4 +318,33 @@ You can also run it in non-interactive mode and inspect logs on demand:
     ...
     docker stop containersdemo_webapi
 
-See tag [Step_03_1](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_1 "Step_03_1") in this repository for reference implementation.
+See tag [Step_03_1](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_1 "Step_03_1")
+in this repository for reference implementation.
+
+### Step 3.2 Client
+
+In this step we'll add Docker container for the client.
+
+Add `Client\Dockerfile` file to define content of the API container.
+
+    FROM microsoft/dotnet:2.0-runtime
+    WORKDIR /app
+    COPY _publish .
+    COPY appsettings.json .
+    ENTRYPOINT ["dotnet", "Client.dll"]
+
+In a command prompt, change directory to `<project directory>\src\Client`
+and run commands
+
+    dotnet build
+    dotnet publish --output _publish
+
+    docker build --tag docker-dotnetcore/client:develop .
+    docker create --name containersdemo_client containers-demo/client:develop
+    docker start containersdemo_client
+    docker logs containersdemo_client
+    ...
+    docker stop containersdemo_client
+
+See tag [Step_03_2](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_2 "Step_03_2")
+in this repository for reference implementation.
