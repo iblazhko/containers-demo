@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using static System.Diagnostics.Trace;
-    
+
 namespace WebApi
 {
     using System.Collections.Concurrent;
@@ -33,14 +33,14 @@ namespace WebApi
             }
 
             var message = $"{logLevel.ToString()} - {eventId.Id} - {name} - {formatter(state, exception)}";
-            
+
             switch (logLevel)
             {
                 case LogLevel.Critical:
                 case LogLevel.Error:
                     TraceError(message);
-                    break;                
-                
+                    break;
+
                 case LogLevel.Warning:
                     TraceWarning(message);
                     break;
@@ -51,11 +51,11 @@ namespace WebApi
             }
         }
     }
-    
+
     public class TraceLoggerProvider : ILoggerProvider
     {
         private readonly ConcurrentDictionary<string, TraceLogger> loggers = new ConcurrentDictionary<string, TraceLogger>();
-        
+
         public ILogger CreateLogger(string categoryName)
         {
             return loggers.GetOrAdd(categoryName, name => new TraceLogger(name));
