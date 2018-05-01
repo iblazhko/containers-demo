@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: containersdemo-client-rs
+  labels:
+    app: containersdemo-client
+    tier: frontend
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: containersdemo-client
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: containersdemo-client
+        tier: frontend
+    spec:
+      containers:
+      - name: containersdemo-client-ctr
+        image: containers-demo/client:develop

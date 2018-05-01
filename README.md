@@ -486,7 +486,7 @@ in this repository for reference implementation.
 Let's create following topology in K8s:
 
 ```txt
-[WebAPI - ReplicaSet, 3 Instances] - [WebAPI - Service] - [Client]
+[WebAPI - ReplicaSet, 3 Instances] - [WebAPI - Service] - [Client - ReplicaSet, 5 Instances]
 ```
 
 - We will have ReplicaSet running 3 instances of our `WebApi`
@@ -495,7 +495,7 @@ Let's create following topology in K8s:
 - We will have one instance of `Client` sending requests to `Service`
   (effectively, to any of our three `WebApi` instances)
 
-#### ReplicaSet
+#### WebAPI - ReplicaSet
 
 Create manifest for the ReplicaSet in `k8s\webapi-rs.yml`:
 
@@ -548,7 +548,7 @@ containersdemo-webapi-rs   3         3         3         ???
 
 Desired and actual instance count should match one from the manifest (3).
 
-#### Service
+#### WebAPI - Service
 
 Create manifest for the Service in `k8s\webapi-svc.yml`:
 
@@ -589,3 +589,53 @@ containersdemo-webapi-svc   NodePort   10.101.88.198   <none>        5000:31319/
 ```
 
 Desired and actual instance count should match one from the manifest (3).
+
+#### Client - ReplicaSet
+
+Create manifest for the ReplicaSet in `k8s\client-rs.yml`:
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: containersdemo-client-rs
+  labels:
+    app: containersdemo-client
+    tier: frontend
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: containersdemo-client
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: containersdemo-client
+        tier: frontend
+    spec:
+      containers:
+      - name: containersdemo-client-ctr
+        image: containers-demo/client:develop
+```
+
+Create the ReplicaSet:
+
+```cmd
+kubectl create -f .\client-rs.yml
+```
+
+Verify that ReplicaSet was created:
+
+```cmd
+kubectl get rs/containersdemo-client-rs
+```
+
+Expected output is
+
+```txt
+NAME                       DESIRED   CURRENT   READY     AGE
+containersdemo-clieint-rs  5         5         5         ???
+```
+
+Desired and actual instance count should match one from the manifest (5).
