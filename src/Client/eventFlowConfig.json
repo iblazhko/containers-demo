@@ -8,6 +8,11 @@
   "outputs": [
     {
         "type": "StdOutput"
+    },
+    {
+      "type": "ElasticSearch",
+      "indexNamePrefix": "containersdemo-client",
+      "serviceUri": "https://localhost:9200"
     }],
   "schemaVersion": "2016-08-11"
 }

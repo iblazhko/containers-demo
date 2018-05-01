@@ -355,6 +355,10 @@ In this step, we will add another Docker container to our system, to run
 MongoDb server, and will modify API implementation to store values
 in the database.
 
+Note that we are adding the MongoDB Docker container only for demonstration
+purposes, to have a self-contained system. In a production environment
+we will have a dedicated MongoDB cluster.
+
     docker run --name containersdemo-mongo -d mongo:latest
 
 Note that MongoDb .NET driver is compatible with `netstandard1.5` or higher.
@@ -389,3 +393,42 @@ to use MongoDb database.
 
 See tag [Step_03_3](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_3 "Step_03_3")
 in this repository for reference implementation.
+
+### Step 3.4 ElasticSearch+Kibana
+
+In this step, we will add two more Docker container to our system,
+to run ElasticSearch and Kibana servers, and will modify logging implementation
+to store logs from both API and Client in centralized ElasticSearch
+database.
+
+Note that this is done only for demonstration purposes, to have a self-contained
+system. In a production environment we will have a dedicated ElasticSearch
+cluster.
+
+    docker pull docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
+    docker run --name containersdemo-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -d docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
+
+    docker pull docker.elastic.co/kibana/kibana-oss:6.2.4
+    docker run --name containersdemo-kibana -p 5601:5601 -e "discovery.type=single-node" -d docker.elastic.co/kibana/kibana-oss:6.2.4
+
+(note that the ElasticSearch repository does not have `latest` tag)
+
+Add configuration settings to WebApi and Client `appsettings.json`
+files:
+
+    "ElasticSearch.Url": "http://localhost:9200",
+    "ElasticSearch.IndexFormat": "containersdemo",
+    "LoggingLevel": "Information"
+
+Add ElasticSearch output package reference:
+
+    cd <project directory>\src
+    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+
+See tag [Step_03_4](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_4 "Step_03_4")
+in this repository for reference implementation.
+
+### Step 4 Kubernetes
+
+TODO
