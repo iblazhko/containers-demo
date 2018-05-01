@@ -173,3 +173,51 @@ You should see output
 Use `curl` or `Postman` client to test the API.
 
 See tag [Step_02_1](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_1 "Step_02_1") in this repository for reference implementation.
+
+### Step 2.2 Client
+
+In this step we'll add a client that will be continuously sending
+random requests to the API. The purpose of this client is to
+emulate some system activity.
+
+Add `Configuration` packages and `appsettings.json` settings file:
+
+    dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration
+    dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.CommandLine
+    dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.Json
+
+
+    appsettings.json:
+    {
+        "ApiUrl": "http://localhost:5000/api",
+        "MaxDelay": "00:00:05"
+    }
+
+Modify `Client` project to send `GET`, `POST`, `PUT`, and `DELETE`
+commands periodically to the API.
+
+Run the API. Change directory to `src\WebApi` and run command
+
+    dotnet run
+
+You should see output
+
+    Now listening on: http://*:5000
+    Application started. Press Ctrl+C to shut down.
+
+Run the client. Leave the API running; in a new command prompt
+change directory to `src\Client` and run command
+
+    dotnet run
+
+You should see that the client is sending random commands, e.g.
+
+    REST API Random Test Client. API Url: http://localhost:5000/api
+    GET http://localhost:5000/api/values
+    POST http://localhost:5000/api/values
+    GET http://localhost:5000/api/values
+    GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+    GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+    DELETE http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+
+See tag [Step_02_2](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_2 "Step_02_2") in this repository for reference implementation.
