@@ -114,21 +114,23 @@ looks like this:
 In command prompt, change directory to the `<project directory>\src`, and
 run following commands:
 
-    dotnet new sln --name Containers
-    dotnet new classlib --name Infrastructure.Logging
-    dotnet new webapi --name WebApi
-    dotnet new xunit --name WebApi.Test.Unit
-    dotnet new console --name Client
+```cmd
+dotnet new sln --name Containers
+dotnet new classlib --name Infrastructure.Logging
+dotnet new webapi --name WebApi
+dotnet new xunit --name WebApi.Test.Unit
+dotnet new console --name Client
 
-    dotnet sln .\Containers.sln add .\Infrastructure.Logging\Infrastructure.Logging.csproj
-    dotnet sln .\Containers.sln add .\WebApi\WebApi.csproj
-    dotnet sln .\Containers.sln add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj
-    dotnet sln .\Containers.sln add .\Client\Client.csproj
+dotnet sln .\Containers.sln add .\Infrastructure.Logging\Infrastructure.Logging.csproj
+dotnet sln .\Containers.sln add .\WebApi\WebApi.csproj
+dotnet sln .\Containers.sln add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj
+dotnet sln .\Containers.sln add .\Client\Client.csproj
 
-    dotnet add .\WebApi\WebApi.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
-    dotnet add .\Client\Client.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
-    dotnet add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj reference .\WebApi\WebApi.csproj
-    dotnet add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
+dotnet add .\WebApi\WebApi.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
+dotnet add .\Client\Client.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
+dotnet add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj reference .\WebApi\WebApi.csproj
+dotnet add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
+```
 
 As a result, the soluition structure will look like this:
 
@@ -141,9 +143,11 @@ As a result, the soluition structure will look like this:
 
 Build the solution to make sure that everything was done correctly:
 
-    dotnet build .\Containers.sln
-    dotnet test .\WebApi.Test.Unit\WebApi.Test.Unit.csproj
-    dotnet publish .\Containers.sln
+```cmd
+dotnet build .\Containers.sln
+dotnet test .\WebApi.Test.Unit\WebApi.Test.Unit.csproj
+dotnet publish .\Containers.sln
+```
 
 You may add a build script to automate the steps above,
 this repository uses PowerShell-based `build.ps1` script.
@@ -168,12 +172,16 @@ request.
 
 Run the API. Change directory to `src\WebApi` and run command
 
-    dotnet run
+```cmd
+dotnet run
+```
 
 You should see output
 
-    Now listening on: http://*:5000
-    Application started. Press Ctrl+C to shut down.
+```txt
+Now listening on: http://*:5000
+Application started. Press Ctrl+C to shut down.
+```
 
 Use `curl` or `Postman` client to test the API.
 
@@ -187,43 +195,55 @@ emulate some system activity.
 
 Add `Configuration` packages and `appsettings.json` settings file:
 
-    dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration
-    dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.CommandLine
-    dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.Json
+```cmd
+dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration
+dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.CommandLine
+dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.Json
+```
 
+appsettings.json:
 
-    appsettings.json:
-    {
-        "ApiUrl": "http://localhost:5000/api",
-        "MaxDelay": "00:00:05"
-    }
+```json
+{
+  "ApiUrl": "http://localhost:5000/api",
+  "MaxDelay": "00:00:05"
+}
+```
 
 Modify `Client` project to send `GET`, `POST`, `PUT`, and `DELETE`
 commands periodically to the API.
 
 Run the API. Change directory to `src\WebApi` and run command
 
-    dotnet run
+```cmd
+dotnet run
+```
 
 You should see output
 
-    Now listening on: http://*:5000
-    Application started. Press Ctrl+C to shut down.
+```txt
+Now listening on: http://*:5000
+Application started. Press Ctrl+C to shut down.
+```
 
 Run the client. Leave the API running; in a new command prompt
 change directory to `src\Client` and run command
 
-    dotnet run
+```cmd
+dotnet run
+```
 
 You should see that the client is sending random commands, e.g.
 
-    REST API Random Test Client. API Url: http://localhost:5000/api
-    GET http://localhost:5000/api/values
-    POST http://localhost:5000/api/values
-    GET http://localhost:5000/api/values
-    GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
-    GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
-    DELETE http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+```txt
+REST API Random Test Client. API Url: http://localhost:5000/api
+GET http://localhost:5000/api/values
+POST http://localhost:5000/api/values
+GET http://localhost:5000/api/values
+GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+DELETE http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
+```
 
 See tag [Step_02_2](https://github.com/iblazhko/containers-demo/releases/tag/Step_02_2 "Step_02_2")
 in this repository for reference implementation.
@@ -237,15 +257,17 @@ implementation and log activity to console.
 This repository uses [Microsoft.Diagnostics.EventFlow](https://github.com/Azure/diagnostics-eventflow/ "Microsoft.Diagnostics.EventFlow")
 as underlying implementation.
 
-    dotnet add .\Infrastructure.Logging\Infrastructure.Logging.csproj package Microsoft.Diagnostics.EventFlow
+```cmd
+dotnet add .\Infrastructure.Logging\Infrastructure.Logging.csproj package Microsoft.Diagnostics.EventFlow
 
-    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow
-    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
-    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow
+dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
+dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
 
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+```
 
 In later steps we will add [ElasticSearch output](https://github.com/Azure/diagnostics-eventflow/#elasticsearch "ElasticSearch output")
 to send logs to centralized storage.
@@ -261,11 +283,13 @@ In this step we'll add Docker container for the API.
 
 Add `WebApi\Dockerfile` file to define content of the API container.
 
-    FROM microsoft/dotnet:2.0-runtime
-    WORKDIR /app
-    EXPOSE 5000
-    COPY _publish .
-    ENTRYPOINT ["dotnet", "WebApi.dll"]
+```Dockerfile
+FROM microsoft/dotnet:2.0-runtime
+WORKDIR /app
+EXPOSE 5000
+COPY _publish .
+ENTRYPOINT ["dotnet", "WebApi.dll"]
+```
 
 There are many ways to compose a Docker container, see
 [Dockerfile reference](https://docs.docker.com/engine/reference/builder/ "Dockerfile reference")
@@ -278,45 +302,53 @@ to be published in the `_publish` directory.
 In a command prompt, change directory to `<project directory>\src\WebApi`
 and run commands
 
-    dotnet build
-    dotnet publish --output _publish
+```cmd
+dotnet build
+dotnet publish --output _publish
 
-    docker build --tag containers-demo/webapi:develop .
+docker build --tag containers-demo/webapi:develop .
+```
 
 You should see output from Docker similar to this:
 
-    Sending build context to Docker daemon    105MB
-    Step 1/5 : FROM microsoft/dotnet:2.0-runtime
-    ---> 059aeb771f22
-    Step 2/5 : WORKDIR /app
-    ---> Using cache
-    ---> cd26e80266c7
-    Step 3/5 : EXPOSE 5000
-    ---> Using cache
-    ---> 46964d341932
-    Step 4/5 : COPY _publish .
-    ---> Using cache
-    ---> 3191af7d0c59
-    Step 5/5 : ENTRYPOINT ["dotnet", "WebApi.dll"]
-    ---> Using cache
-    ---> b6fbf6ec67c3
-    Successfully built b6fbf6ec67c3
-    Successfully tagged containers-demo/webapi:develop
-    SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.
+```txt
+Sending build context to Docker daemon    105MB
+Step 1/5 : FROM microsoft/dotnet:2.0-runtime
+---> 059aeb771f22
+Step 2/5 : WORKDIR /app
+---> Using cache
+---> cd26e80266c7
+Step 3/5 : EXPOSE 5000
+---> Using cache
+---> 46964d341932
+Step 4/5 : COPY _publish .
+---> Using cache
+---> 3191af7d0c59
+Step 5/5 : ENTRYPOINT ["dotnet", "WebApi.dll"]
+---> Using cache
+---> b6fbf6ec67c3
+Successfully built b6fbf6ec67c3
+Successfully tagged containers-demo/webapi:develop
+SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.
+```
 
 (your ids will be different).
 We will address the secutiry warning later.
 
-    docker create --name containersdemo_webapi containers-demo/webapi:develop
-    docker start --interactive containersdemo_webapi
+```cmd
+docker create --name containersdemo_webapi containers-demo/webapi:develop
+docker start --interactive containersdemo_webapi
+```
 
 API should now be running in Docker. Press `Ctrl+C` when you need to stop it.
 You can also run it in non-interactive mode and inspect logs on demand:
 
-    docker start containersdemo_webapi
-    docker logs containersdemo_webapi
-    ...
-    docker stop containersdemo_webapi
+```cmd
+docker start containersdemo_webapi
+docker logs containersdemo_webapi
+...
+docker stop containersdemo_webapi
+```
 
 See tag [Step_03_1](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_1 "Step_03_1")
 in this repository for reference implementation.
@@ -327,24 +359,28 @@ In this step we'll add Docker container for the client.
 
 Add `Client\Dockerfile` file to define content of the API container.
 
-    FROM microsoft/dotnet:2.0-runtime
-    WORKDIR /app
-    COPY _publish .
-    COPY appsettings.json .
-    ENTRYPOINT ["dotnet", "Client.dll"]
+```Dockerfile
+FROM microsoft/dotnet:2.0-runtime
+WORKDIR /app
+COPY _publish .
+COPY appsettings.json .
+ENTRYPOINT ["dotnet", "Client.dll"]
+```
 
 In a command prompt, change directory to `<project directory>\src\Client`
 and run commands
 
-    dotnet build
-    dotnet publish --output _publish
+```cmd
+dotnet build
+dotnet publish --output _publish
 
-    docker build --tag docker-dotnetcore/client:develop .
-    docker create --name containersdemo_client containers-demo/client:develop
-    docker start containersdemo_client
-    docker logs containersdemo_client
-    ...
-    docker stop containersdemo_client
+docker build --tag docker-dotnetcore/client:develop .
+docker create --name containersdemo_client containers-demo/client:develop
+docker start containersdemo_client
+docker logs containersdemo_client
+...
+docker stop containersdemo_client
+```
 
 See tag [Step_03_2](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_2 "Step_03_2")
 in this repository for reference implementation.
@@ -359,32 +395,40 @@ Note that we are adding the MongoDB Docker container only for demonstration
 purposes, to have a self-contained system. In a production environment
 we will have a dedicated MongoDB cluster.
 
-    docker run --name containersdemo-mongo -d mongo:latest
+```cmd
+docker run --name containersdemo-mongo -d mongo:latest
+```
 
 Note that MongoDb .NET driver is compatible with `netstandard1.5` or higher.
 Check `TargetFramework` in project files to make sure that they
 meet this requirement:
 
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+```xml
+<TargetFramework>netcoreapp2.0</TargetFramework>
+```
 
 Modify API implementation to use database instead of in-memory dictionary.
 
-    cd <project directory>\src
+```cmd
+cd <project directory>\src
 
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.CommandLine
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.Json
-    dotnet add .\WebApi\WebApi.csproj package MongoDB.Driver
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.CommandLine
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.Json
+dotnet add .\WebApi\WebApi.csproj package MongoDB.Driver
+```
 
 In `<project directory>\src\WebApi\appsettings.json` add settings for MongoDb:
 
-    {
-      "MongoDb.ServerAddress": "localhost",
-      "MongoDb.ServerPort": "27017",
-      "MongoDb.DatabaseName": "containersdemo",
-      "MongoDb.UserName": "",
-      "MongoDb.UserPassword": ""
-    }
+```json
+{
+    "MongoDb.ServerAddress": "localhost",
+    "MongoDb.ServerPort": "27017",
+    "MongoDb.DatabaseName": "containersdemo",
+    "MongoDb.UserName": "",
+    "MongoDb.UserPassword": ""
+}
+```
 
 Modify `<project directory>\src\WebApi\Startup.cs`
 to read MongoDb settings, and
@@ -405,30 +449,143 @@ Note that this is done only for demonstration purposes, to have a self-contained
 system. In a production environment we will have a dedicated ElasticSearch
 cluster.
 
-    docker pull docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
-    docker run --name containersdemo-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -d docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
+```cmd
+docker pull docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
+docker run --name containersdemo-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -d docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
 
-    docker pull docker.elastic.co/kibana/kibana-oss:6.2.4
-    docker run --name containersdemo-kibana -p 5601:5601 -e "discovery.type=single-node" -d docker.elastic.co/kibana/kibana-oss:6.2.4
+docker pull docker.elastic.co/kibana/kibana-oss:6.2.4
+docker run --name containersdemo-kibana -p 5601:5601 -e "discovery.type=single-node" -d docker.elastic.co/kibana/kibana-oss:6.2.4
+```
 
 (note that the ElasticSearch repository does not have `latest` tag)
 
 Add configuration settings to WebApi and Client `appsettings.json`
 files:
 
-    "ElasticSearch.Url": "http://localhost:9200",
-    "ElasticSearch.IndexFormat": "containersdemo",
-    "LoggingLevel": "Information"
+```json
+"ElasticSearch.Url": "http://localhost:9200",
+"ElasticSearch.IndexFormat": "containersdemo",
+"LoggingLevel": "Information"
+```
 
 Add ElasticSearch output package reference:
 
-    cd <project directory>\src
-    dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
-    dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+```cmd
+cd <project directory>\src
+dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+dotnet add .\Client\Client.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
+```
 
 See tag [Step_03_4](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_4 "Step_03_4")
 in this repository for reference implementation.
 
 ### Step 4 Kubernetes
 
-TODO
+#### Topology Overview
+
+Let's create following topology in K8s:
+
+```txt
+[WebAPI - ReplicaSet, 3 Instances] - [WebAPI - Service] - [Client]
+```
+
+- We will have ReplicaSet running 3 instances of our `WebApi`
+- On top of the ReplicaSet, we will have a Service that will provide
+  a stable IP address and simple load balancing
+- We will have one instance of `Client` sending requests to `Service`
+  (effectively, to any of our three `WebApi` instances)
+
+#### ReplicaSet
+
+Create manifest for the ReplicaSet in `k8s\webapi-rs.yml`:
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: containersdemo-webapi-rs
+  labels:
+    app: containersdemo-webapi
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: backend
+    matchExpressions:
+      - {key: tier, operator: In, values: [backend]}
+  template:
+    metadata:
+      labels:
+        app: containersdemo-webapi
+        tier: backend
+    spec:
+      containers:
+      - name: containersdemo-webapi-ctr
+        image: containers-demo/webapi:develop
+        ports:
+        - containerPort: 5000
+```
+
+Create the ReplicaSet:
+
+```cmd
+kubectl create -f .\webapi-rs.yml
+```
+
+Verify that ReplicaSet was created:
+
+```cmd
+kubectl get rs/containersdemo-webapi-rs
+```
+
+Expected output is
+
+```txt
+NAME                       DESIRED   CURRENT   READY     AGE
+containersdemo-webapi-rs   3         3         3         ???
+```
+
+Desired and actual instance count should match one from the manifest (3).
+
+#### Service
+
+Create manifest for the Service in `k8s\webapi-svc.yml`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: containersdemo-webapi-svc
+  labels:
+    app: containersdemo-webapi
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: containersdemo-webapi
+```
+
+Create the Service:
+
+```cmd
+kubectl create -f .\webapi-svc.yml
+```
+
+Verify that Service was created:
+
+```cmd
+kubectl get svc/containersdemo-webapi-svc
+```
+
+Expected output is
+
+```txt
+NAME                        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+containersdemo-webapi-svc   NodePort   10.101.88.198   <none>        5000:31319/TCP   ???
+```
+
+Desired and actual instance count should match one from the manifest (3).

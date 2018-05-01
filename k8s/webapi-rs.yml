@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: containersdemo-webapi-rs
+  labels:
+    app: containersdemo-webapi
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: backend
+    matchExpressions:
+      - {key: tier, operator: In, values: [backend]}
+  template:
+    metadata:
+      labels:
+        app: containersdemo-webapi
+        tier: backend
+    spec:
+      containers:
+      - name: containersdemo-webapi-ctr
+        image: containers-demo/webapi:develop
+        ports:
+        - containerPort: 5000

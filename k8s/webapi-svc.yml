@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: containersdemo-webapi-svc
+  labels:
+    app: containersdemo-webapi
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: containersdemo-webapi
