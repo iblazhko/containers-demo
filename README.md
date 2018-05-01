@@ -148,18 +148,23 @@ Build the solution to make sure that everything was done correctly:
 You may add a build script to automate the steps above,
 this repository uses PowerShell-based `build.ps1` script.
 
-See tag [Step_01](https://github.com/iblazhko/containers-demo/releases/tag/Step_01 "Step_01") in this repository for reference implementation.
+See tag [Step_01](https://github.com/iblazhko/containers-demo/releases/tag/Step_01 "Step_01")
+in this repository for reference implementation.
 
 ## Step 2. Implementing WebAPI and Client
 
 ### Step 2.1 WebAPI
 
-In this step we'll add simplest possible API implementation based on `Dictionary<string,string>`.
-The purpose of this step is just to see that API starts and responds to requests, so values will not persist after API restart; we'll add persistent storage in later steps.
+In this step we'll add simplest possible API implementation based on
+`Dictionary<string,string>`. The purpose of this step is just to see that
+API starts and responds to requests, so values will not persist after
+API restart; we'll add persistent storage in later steps.
 
 Modify `WebApi\Controllers\ValueController` to implement
 `GET`, `POST`, `PUT`, `DELETE` operations using static
-`Dictionary<string,string>` as values repository. Note that the dictionary has to be static because ASP.NET Core will create new controller instance per request.
+`Dictionary<string,string>` as values repository. Note that the dictionary has
+to be static because ASP.NET Core will create new controller instance per
+request.
 
 Run the API. Change directory to `src\WebApi` and run command
 
@@ -172,7 +177,7 @@ You should see output
 
 Use `curl` or `Postman` client to test the API.
 
-See tag [Step_02_1](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_1 "Step_02_1") in this repository for reference implementation.
+See tag [Step_02_1](https://github.com/iblazhko/containers-demo/releases/tag/Step_02_1 "Step_02_1") in this repository for reference implementation.
 
 ### Step 2.2 Client
 
@@ -220,7 +225,8 @@ You should see that the client is sending random commands, e.g.
     GET http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
     DELETE http://localhost:5000/api/values/5baa8239-70b4-42d6-a360-1cc1c73ce9ac
 
-See tag [Step_02_2](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_2 "Step_02_2") in this repository for reference implementation.
+See tag [Step_02_2](https://github.com/iblazhko/containers-demo/releases/tag/Step_02_2 "Step_02_2")
+in this repository for reference implementation.
 
 ### Step 2.3 Logging
 
@@ -241,6 +247,75 @@ as underlying implementation.
     dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.StdOutput
     dotnet add .\WebApi\WebApi.csproj package Microsoft.Diagnostics.EventFlow.Outputs.ElasticSearch
 
-In later steps we will add [ElasticSearch sink](https://github.com/serilog/serilog-sinks-elasticsearch "ElasticSearch sink") to send logs to centralized storage.
+In later steps we will add [ElasticSearch output](https://github.com/Azure/diagnostics-eventflow/#elasticsearch "ElasticSearch output")
+to send logs to centralized storage.
 
-See tag [Step_02_3](https://github.com/iblazhko/docker-dotnetcore-demo/releases/tag/Step_02_3 "Step_02_3") in this repository for reference implementation.
+See tag [Step_02_3](https://github.com/iblazhko/containers-demo/releases/tag/Step_02_3 "Step_02_3")
+in this repository for reference implementation.
+
+## Step 3. Docker Containers
+
+### Step 3.1 WebAPI
+
+In this step we'll add Docker container for the API.
+
+Add `WebApi\Dockerfile` file to define content of the API container.
+
+    FROM microsoft/dotnet:2.0-runtime
+    WORKDIR /app
+    EXPOSE 5000
+    COPY _publish .
+    ENTRYPOINT ["dotnet", "WebApi.dll"]
+
+There are many ways to compose a Docker container, see
+[Dockerfile reference](https://docs.docker.com/engine/reference/builder/ "Dockerfile reference")
+for more information.
+
+In this project we'll be using `dotnet publish` output, i.e. compiled binaries,
+to compose API container. `Dockerfile` in this example expects the application
+to be published in the `_publish` directory.
+
+In a command prompt, change directory to `<project directory>\src\WebApi`
+and run commands
+
+    dotnet build
+    dotnet publish --output _publish
+
+    docker build --tag containers-demo/webapi:develop .
+
+You should see output from Docker similar to this:
+
+    Sending build context to Docker daemon    105MB
+    Step 1/5 : FROM microsoft/dotnet:2.0-runtime
+    ---> 059aeb771f22
+    Step 2/5 : WORKDIR /app
+    ---> Using cache
+    ---> cd26e80266c7
+    Step 3/5 : EXPOSE 5000
+    ---> Using cache
+    ---> 46964d341932
+    Step 4/5 : COPY _publish .
+    ---> Using cache
+    ---> 3191af7d0c59
+    Step 5/5 : ENTRYPOINT ["dotnet", "WebApi.dll"]
+    ---> Using cache
+    ---> b6fbf6ec67c3
+    Successfully built b6fbf6ec67c3
+    Successfully tagged containers-demo/webapi:develop
+    SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.
+
+(your ids will be different).
+We will address the secutiry warning later.
+
+    docker create --name containersdemo_webapi containers-demo/webapi:develop
+    docker start --interactive containersdemo_webapi
+
+API should now be running in Docker. Press `Ctrl+C` when you need to stop it.
+You can also run it in non-interactive mode and inspect logs on demand:
+
+    docker start containersdemo_webapi
+    docker logs containersdemo_webapi
+    ...
+    docker stop containersdemo_webapi
+
+See tag [Step_03_1](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_1 "Step_03_1") in this repository for reference implementation.

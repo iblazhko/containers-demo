@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using static System.Diagnostics.Trace;
 
 namespace WebApi.Controllers
 {
@@ -15,6 +16,8 @@ namespace WebApi.Controllers
         [HttpGet]
         public IdValuePairType[] Get()
         {
+            TraceInformation("GET All");
+            
             return repository
                 .Select(kvp => new IdValuePairType(kvp.Key, kvp.Value))
                 .ToArray();
@@ -24,6 +27,8 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public IdValuePairType Get(string id)
         {
+            TraceInformation($"GET {id}");
+
             return repository.ContainsKey(id) ? new IdValuePairType(id, repository[id]) : null;
         }
 
@@ -32,6 +37,7 @@ namespace WebApi.Controllers
         public void Post([FromBody]ValueType valueEnvelope)
         {
             var id = Guid.NewGuid().ToString();
+            TraceInformation($"POST {id}");
             repository.Add(id, valueEnvelope.value);
         }
 
@@ -39,6 +45,7 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public void Put(string id, [FromBody]ValueType valueEnvelope)
         {
+            TraceInformation($"PUT {id}");
             if (repository.ContainsKey(id))
                 repository[id] = valueEnvelope.value;
         }
@@ -47,6 +54,7 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public void Delete(string id)
         {
+            TraceInformation($"DELETE {id}");
             if (repository.ContainsKey(id))
                 repository.Remove(id);
         }

@@ -7,8 +7,8 @@ Param(
     [string]$Configuration="Release",
 
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("Any CPU", "x64")]
-    [string]$Platform="Any CPU"
+    [ValidateSet("linux-x64", "win-x64")]
+    [string]$Runtime="linux-x64"
 )
 
 $buildDir=$PSScriptRoot
@@ -19,15 +19,15 @@ Write-Host -ForegroundColor Green "*** Building $Configuration in $solutionDir"
 
 Write-Host -ForegroundColor Yellow ""
 Write-Host -ForegroundColor Yellow "*** Build"
-dotnet build "$srcDir\Containers.sln"
+dotnet build "$srcDir\Containers.sln" --configuration $Configuration
 
 Write-Host -ForegroundColor Yellow ""
 Write-Host -ForegroundColor Yellow "*** Unit tests"
-dotnet test "$srcDir\WebApi.Test.Unit\WebApi.Test.Unit.csproj"
+dotnet test "$srcDir\WebApi.Test.Unit\WebApi.Test.Unit.csproj" --configuration $Configuration
 
 Write-Host -ForegroundColor Yellow ""
 Write-Host -ForegroundColor Yellow "*** Publish"
-dotnet publish "$srcDir\Containers.sln"
+dotnet publish "$srcDir\Containers.sln" --configuration $Configuration --runtime $Runtime --output _publish
 
 Write-Host -ForegroundColor Green ""
 Write-Host -ForegroundColor Green "*** Preparing Docker images"
