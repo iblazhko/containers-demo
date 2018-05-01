@@ -1,21 +1,18 @@
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: containersdemo-webapi-rs
+  name: containersdemo-webapi-deployment
   labels:
     app: containersdemo-webapi
-    tier: backend
 spec:
   replicas: 3
   selector:
     matchLabels:
       app: containersdemo-webapi
-      tier: backend
   template:
     metadata:
       labels:
         app: containersdemo-webapi
-        tier: backend
     spec:
       containers:
       - name: containersdemo-webapi-ctr

@@ -14,6 +14,7 @@ Param(
 $buildDir=$PSScriptRoot
 $solutionDir=$buildDir
 $srcDir=[System.IO.Path]::Combine($solutionDir, "src")
+$k8sDir=[System.IO.Path]::Combine($solutionDir, "k8s")
 
 Write-Host -ForegroundColor Green "*** Building $Configuration in $solutionDir"
 
@@ -22,21 +23,38 @@ Write-Host -ForegroundColor Yellow "*** Build"
 dotnet build "$srcDir\Containers.sln" --configuration $Configuration
 
 Write-Host -ForegroundColor Yellow ""
-Write-Host -ForegroundColor Yellow "*** Unit tests"
+Write-Host -ForegroundColor Yellow "***** Unit tests"
 dotnet test "$srcDir\WebApi.Test.Unit\WebApi.Test.Unit.csproj" --configuration $Configuration
 
 Write-Host -ForegroundColor Yellow ""
-Write-Host -ForegroundColor Yellow "*** Publish"
+Write-Host -ForegroundColor Yellow "***** Publish"
 dotnet publish "$srcDir\Containers.sln" --configuration $Configuration --runtime $Runtime --output _publish
 
 Write-Host -ForegroundColor Green ""
-Write-Host -ForegroundColor Green "*** Preparing Docker images"
+Write-Host -ForegroundColor Green "*** Clean up existing deployment"
 
-Write-Host -ForegroundColor Yellow ""
-Write-Host -ForegroundColor Yellow "*** TODO"
+kubectl delete deploy/containersdemo-client-deployment
+kubectl delete deploy/containersdemo-webapi-deployment
+kubectl delete deploy/containersdemo-webapi-service
+docker image prune -f
 
 Write-Host -ForegroundColor Green ""
 Write-Host -ForegroundColor Green "*** Deploying to Kubernetes"
 
 Write-Host -ForegroundColor Yellow ""
-Write-Host -ForegroundColor Yellow "*** TODO"
+Write-Host -ForegroundColor Yellow "***** Building WebAPI Docker container"
+
+Set-Location -Path "$srcDir\WebApi"
+docker build --tag containers-demo/webapi:develop .
+
+Write-Host -ForegroundColor Yellow ""
+Write-Host -ForegroundColor Yellow "***** Building Client Docker container"
+Set-Location -Path "$srcDir\Client"
+docker build --tag docker-dotnetcore/client:develop .
+
+Write-Host -ForegroundColor Yellow ""
+Write-Host -ForegroundColor Yellow "***** Kubernetes"
+Set-Location -Path $k8sDir
+kubectl create -f .\webapi-deployment.yml
+kubectl create -f .\webapi-service.yml
+kubectl create -f .\client-deployment.yml

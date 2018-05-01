@@ -1,21 +1,18 @@
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: containersdemo-client-rs
+  name: containersdemo-client-deployment
   labels:
     app: containersdemo-client
-    tier: frontend
 spec:
   replicas: 5
   selector:
     matchLabels:
       app: containersdemo-client
-      tier: frontend
   template:
     metadata:
       labels:
         app: containersdemo-client
-        tier: frontend
     spec:
       containers:
       - name: containersdemo-client-ctr
