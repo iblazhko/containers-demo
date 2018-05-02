@@ -1,6 +1,6 @@
 # Docker and Kubernetes
 
-This repository demostrates using Docker and Kubernetes to run
+This repository demonstrates using Docker and Kubernetes to run
 .NET Core based system.
 
 Aim is to have a realistic demo, but still simple enough to be able to present
@@ -132,7 +132,7 @@ dotnet add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj reference .\WebApi\WebApi.
 dotnet add .\WebApi.Test.Unit\WebApi.Test.Unit.csproj reference .\Infrastructure.Logging\Infrastructure.Logging.csproj
 ```
 
-As a result, the soluition structure will look like this:
+As a result, the solution structure will look like this:
 
     build\
     src\
@@ -201,7 +201,7 @@ dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.Com
 dotnet add .\Client\Client.csproj package Microsoft.Extensions.Configuration.Json
 ```
 
-appsettings.json:
+`appsettings.json`:
 
 ```json
 {
@@ -251,7 +251,7 @@ in this repository for reference implementation.
 ### Step 2.3 Logging
 
 To ensure that system activity is logged consistently, add logging implementation
-to `Infrastracture.Logging`; modify `WebApi` and `Client` projects to use that
+to `Infrastructure.Logging`; modify `WebApi` and `Client` projects to use that
 implementation and log activity to console.
 
 This repository uses [Microsoft.Diagnostics.EventFlow](https://github.com/Azure/diagnostics-eventflow/ "Microsoft.Diagnostics.EventFlow")
@@ -384,10 +384,10 @@ docker stop containersdemo_client
 See tag [Step_03_2](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_2 "Step_03_2")
 in this repository for reference implementation.
 
-### Step 3.3 MongoDb
+### Step 3.3 MongoDB
 
 In this step, we will add another Docker container to our system, to run
-MongoDb server, and will modify API implementation to store values
+MongoDB server, and will modify API implementation to store values
 in the database.
 
 Note that we are adding the MongoDB Docker container only for demonstration
@@ -398,7 +398,7 @@ we will have a dedicated MongoDB cluster.
 docker run --name containersdemo-mongo -d mongo:latest
 ```
 
-Note that MongoDb .NET driver is compatible with `netstandard1.5` or higher.
+Note that MongoDB .NET driver is compatible with `netstandard1.5` or higher.
 Check `TargetFramework` in project files to make sure that they
 meet this requirement:
 
@@ -417,22 +417,22 @@ dotnet add .\WebApi\WebApi.csproj package Microsoft.Extensions.Configuration.Jso
 dotnet add .\WebApi\WebApi.csproj package MongoDB.Driver
 ```
 
-In `<project directory>\src\WebApi\appsettings.json` add settings for MongoDb:
+In `<project directory>\src\WebApi\appsettings.json` add settings for MongoDB:
 
 ```json
 {
-    "MongoDb.ServerAddress": "localhost",
-    "MongoDb.ServerPort": "27017",
-    "MongoDb.DatabaseName": "containersdemo",
-    "MongoDb.UserName": "",
-    "MongoDb.UserPassword": ""
+    "MongoDB.ServerAddress": "localhost",
+    "MongoDB.ServerPort": "27017",
+    "MongoDB.DatabaseName": "containersdemo",
+    "MongoDB.UserName": "",
+    "MongoDB.UserPassword": ""
 }
 ```
 
 Modify `<project directory>\src\WebApi\Startup.cs`
-to read MongoDb settings, and
+to read MongoDB settings, and
 `<project directory>\src\WebApi\Controllers\ValuesController.cs`
-to use MongoDb database.
+to use MongoDB database.
 
 See tag [Step_03_3](https://github.com/iblazhko/containers-demo/releases/tag/Step_03_3 "Step_03_3")
 in this repository for reference implementation.
