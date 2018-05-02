@@ -386,6 +386,9 @@ in this repository for reference implementation.
 
 ### Step 3.3 MongoDB
 
+(TODO: MongoDB Docker container is optional and not really
+required by Kubernetes deployment the way it is now.)
+
 In this step, we will add another Docker container to our system, to run
 MongoDB server, and will modify API implementation to store values
 in the database.
@@ -442,6 +445,9 @@ See tag [Step_03_3](https://github.com/iblazhko/containers-demo/releases/tag/Ste
 in this repository for reference implementation.
 
 ### Step 3.4 ElasticSearch+Kibana
+
+(TODO: ElasticSearch and Kibana Docker containers are optional and not really
+required by Kubernetes deployment the way it is now.)
 
 In this step, we will add two more Docker container to our system,
 to run ElasticSearch and Kibana servers, and will modify logging implementation
@@ -675,8 +681,8 @@ kubectl get svc/containersdemo-webapi-service
 Expected output is
 
 ```txt
-NAME                            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-containersdemo-webapi-service   NodePort   10.101.88.198   <none>        5000:31319/TCP   ???
+NAME                            TYPE         CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+containersdemo-webapi-service   LoadBalancer ?.?.?.?         <none>        5000:31319/TCP   ???
 ```
 
 Desired and actual instance count should match one from the manifest (3).
@@ -749,5 +755,5 @@ Log output should be similar to examples above for the console apps.
 
 #### Infrastructure
 
-TODO: Deploy ElasticSearch+Kibana and MongoDB to Kubernetes to make this example
-fully self-contained.
+TODO: Consider deploying ElasticSearch+Kibana and MongoDB to Kubernetes
+to make this example fully self-contained.
