@@ -12,7 +12,7 @@
     {
       "type": "ElasticSearch",
       "indexNamePrefix": "containersdemo-client",
-      "serviceUri": "https://localhost:9200"
+      "serviceUri": "https://containersdemo-elasticsearch:9200"
     }],
   "schemaVersion": "2016-08-11"
 }

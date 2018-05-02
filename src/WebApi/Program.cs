@@ -23,12 +23,12 @@ namespace WebApi
 
             var apiUrl = SettingsResolver("ApiUrl");
 
-            MongoDbConfiguration.ServerAddress = SettingsResolver("MongoDb.ServerAddress");
-            MongoDbConfiguration.ServerPort = int.Parse(SettingsResolver("MongoDb.ServerPort"));
-            MongoDbConfiguration.DatabaseName = SettingsResolver("MongoDb.DatabaseName");
-            MongoDbConfiguration.UserName = SettingsResolver("MongoDb.UserName");
-            MongoDbConfiguration.UserPassword = SettingsResolver("MongoDb.UserPassword");
-            
+            MongoDbConfiguration.ServerAddress = SettingsResolver("MongoDB.ServerAddress");
+            MongoDbConfiguration.ServerPort = int.Parse(SettingsResolver("MongoDB.ServerPort"));
+            MongoDbConfiguration.DatabaseName = SettingsResolver("MongoDB.DatabaseName");
+            MongoDbConfiguration.UserName = SettingsResolver("MongoDB.UserName");
+            MongoDbConfiguration.UserPassword = SettingsResolver("MongoDB.UserPassword");
+
             using(DiagnosticPipelineFactory.CreatePipeline("eventFlowConfig.json"))
             {
                 var host = new WebHostBuilder()
@@ -37,10 +37,11 @@ namespace WebApi
                     .UseContentRoot(appDir)
                     .UseStartup<Startup>()
                     .Build();
-                
-                TraceInformation($"WebAPI starting at {apiUrl}");
 
-                host.Run();                
+                TraceInformation($"WebAPI starting at {apiUrl}");
+                TraceInformation($"Using MongoDB at {MongoDbConfiguration.ServerAddress}:{MongoDbConfiguration.ServerPort}/{MongoDbConfiguration.DatabaseName}");
+
+                host.Run();
             }
         }
 
@@ -51,7 +52,7 @@ namespace WebApi
                 var codeBase = Assembly.GetExecutingAssembly().CodeBase;
                 var uri = new UriBuilder(codeBase);
                 var path = Uri.UnescapeDataString(uri.Path);
-                
+
                 return Path.GetDirectoryName(path);
             }
         }

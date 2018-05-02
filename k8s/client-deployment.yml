@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: containersdemo-client-deployment
+  labels:
+    app: containersdemo-client
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: containersdemo-client
+  template:
+    metadata:
+      labels:
+        app: containersdemo-client
+    spec:
+      containers:
+      - name: containersdemo-client-ctr
+        image: containers-demo/client:develop

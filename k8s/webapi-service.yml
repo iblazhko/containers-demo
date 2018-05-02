@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: containersdemo-webapi-service
+  labels:
+    app: containersdemo-webapi
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: webapi-port-lb
+  selector:
+    app: containersdemo-webapi

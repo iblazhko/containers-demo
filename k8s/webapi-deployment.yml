@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: containersdemo-webapi-deployment
+  labels:
+    app: containersdemo-webapi
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: containersdemo-webapi
+  template:
+    metadata:
+      labels:
+        app: containersdemo-webapi
+    spec:
+      containers:
+      - name: containersdemo-webapi-ctr
+        image: containers-demo/webapi:develop
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+          name: webapi-port-po
