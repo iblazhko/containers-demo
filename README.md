@@ -373,7 +373,7 @@ and run commands
 dotnet build
 dotnet publish --output _publish
 
-docker build --tag docker-dotnetcore/client:develop .
+docker build --tag containersdemo/client:develop .
 docker create --name containersdemo_client containers-demo/client:develop
 docker start containersdemo_client
 docker logs containersdemo_client

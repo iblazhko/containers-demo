@@ -19,3 +19,5 @@ spec:
         image: containers-demo/webapi:develop
         ports:
         - containerPort: 5000
+          protocol: TCP
+          name: containersdemo-webapi-port-po

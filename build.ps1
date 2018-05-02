@@ -11,6 +11,7 @@ Param(
     [string]$Runtime="linux-x64"
 )
 
+$startDir=Get-Location
 $buildDir=$PSScriptRoot
 $solutionDir=$buildDir
 $srcDir=[System.IO.Path]::Combine($solutionDir, "src")
@@ -35,7 +36,7 @@ Write-Host -ForegroundColor Green "*** Clean up existing deployment"
 
 kubectl delete deploy/containersdemo-client-deployment
 kubectl delete deploy/containersdemo-webapi-deployment
-kubectl delete deploy/containersdemo-webapi-service
+kubectl delete svc/containersdemo-webapi-service
 docker image prune -f
 
 Write-Host -ForegroundColor Green ""
@@ -50,7 +51,7 @@ docker build --tag containers-demo/webapi:develop .
 Write-Host -ForegroundColor Yellow ""
 Write-Host -ForegroundColor Yellow "***** Building Client Docker container"
 Set-Location -Path "$srcDir\Client"
-docker build --tag docker-dotnetcore/client:develop .
+docker build --tag containers-demo/client:develop .
 
 Write-Host -ForegroundColor Yellow ""
 Write-Host -ForegroundColor Yellow "***** Kubernetes"
@@ -58,3 +59,5 @@ Set-Location -Path $k8sDir
 kubectl create -f .\webapi-deployment.yml
 kubectl create -f .\webapi-service.yml
 kubectl create -f .\client-deployment.yml
+
+Set-Location $startDir
