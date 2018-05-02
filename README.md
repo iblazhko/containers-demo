@@ -622,6 +622,8 @@ spec:
         image: containers-demo/webapi:develop
         ports:
         - containerPort: 5000
+          protocol: TCP
+          name: webapi-port-po
 ```
 
 Create the Deployment:
@@ -657,11 +659,12 @@ metadata:
   labels:
     app: containersdemo-webapi
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - port: 5000
     targetPort: 5000
     protocol: TCP
+    name: webapi-port-lb
   selector:
     app: containersdemo-webapi
 ```
