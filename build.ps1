@@ -38,7 +38,7 @@ kubectl delete deploy/containersdemo-client-deployment
 kubectl delete deploy/containersdemo-webapi-deployment
 kubectl delete svc/containersdemo-webapi-service
 kubectl delete svc/containersdemo-mongodb
-kubectl delete svc/containersdemo-containersdemo-elasticsearch
+kubectl delete svc/containersdemo-elasticsearch
 docker image prune -f
 
 Write-Host -ForegroundColor Green ""
