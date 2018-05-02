@@ -421,13 +421,17 @@ In `<project directory>\src\WebApi\appsettings.json` add settings for MongoDB:
 
 ```json
 {
-    "MongoDB.ServerAddress": "localhost",
+    "MongoDB.ServerAddress": "A.B.C.D",
     "MongoDB.ServerPort": "27017",
     "MongoDB.DatabaseName": "containersdemo",
     "MongoDB.UserName": "",
     "MongoDB.UserPassword": ""
 }
 ```
+
+Where `A.B.C.D` is the IP address of a host where MongoDB Server is running.
+Note that we need to use a host name or IP that will be accessible from within
+a container, so avoid using `localhost`.
 
 Modify `<project directory>\src\WebApi\Startup.cs`
 to read MongoDB settings, and
@@ -462,10 +466,14 @@ Add configuration settings to WebApi and Client `appsettings.json`
 files:
 
 ```json
-"ElasticSearch.Url": "http://localhost:9200",
+"ElasticSearch.Url": "http://A.B.C.D:9200",
 "ElasticSearch.IndexFormat": "containersdemo",
 "LoggingLevel": "Information"
 ```
+
+Where `A.B.C.D` is the IP address of a host where ElasticSearch Server is running.
+Note that we need to use a host name or IP that will be accessible from within
+a container, so avoid using `localhost`.
 
 Add ElasticSearch output package reference:
 
@@ -486,13 +494,101 @@ Let's create following topology in K8s:
 
 ```txt
 [WebAPI - Deployment, 3 Instances] - [WebAPI - Service] - [Client - Deployment, 5 Instances]
+[MongoDB - Service]
+[ElasticSearch - Service]
 ```
+
+(TODO: make a better diagram)
 
 - We will have Deployment running 3 instances of our `WebApi`
 - On top of the Deployment, we will have a Service that will provide
   a stable IP address and simple load balancing
 - We will have Deployment running 5 instances of `Client` sending requests
   to `Service` (effectively, to any of our three `WebApi` instances)
+- We wile have MongoDB and ElasticSearch services that will point to
+  external instances
+
+#### Infrastructure - MongoDB
+
+To make MongoDB accessible for pods inside Kubernetes, we will create a service
+that will redirect requests to an external instance.
+
+Create manifest for the MongoDB Service in `k8s\mongodb-service.yml`:
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: containersdemo-mongodb
+spec:
+  type: ExternalName
+  externalName: <external hostname or IP>
+```
+
+For the pods inside the Kubernetes MongoDB will be accessible by hostname
+`containersdemo-mongodb`.
+
+Create the Service:
+
+```cmd
+kubectl create -f .\mongodb-service.yml
+```
+
+Verify that Service was created:
+
+```cmd
+kubectl get svc/containersdemo-mongodb
+```
+
+Expected output is
+
+```txt
+NAME                     TYPE           CLUSTER-IP   EXTERNAL-IP     PORT(S)   AGE
+containersdemo-mongodb   ExternalName   <none>       ?.?.?.?         <none>    ???
+```
+
+`EXTERNAL-IP` should match value from the manifest.
+
+#### Infrastructure - ElasticSearch
+
+To make ElasticSearch accessible for pods inside Kubernetes, we will create a service
+that will redirect requests to an external instance.
+
+Create manifest for the ElasticSearch Service in `k8s\elasticsearch-service.yml`:
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: containersdemo-elasticsearch
+spec:
+  type: ExternalName
+  externalName: <external hostname or IP>
+```
+
+For the pods inside the Kubernetes ElasticSearch will be accessible by hostname
+`containersdemo-elasticsearch`.
+
+Create the Service:
+
+```cmd
+kubectl create -f .\elasticsearch-service.yml
+```
+
+Verify that Service was created:
+
+```cmd
+kubectl get svc/containersdemo-elasticsearch
+```
+
+Expected output is
+
+```txt
+NAME                           TYPE           CLUSTER-IP   EXTERNAL-IP     PORT(S)   AGE
+containersdemo-elasticsearch   ExternalName   <none>       ?.?.?.?         <none>    ??
+```
+
+`EXTERNAL-IP` should match value from the manifest.
 
 #### WebAPI - Deployment
 
@@ -587,7 +683,7 @@ Desired and actual instance count should match one from the manifest (3).
 
 #### Client - Deployment
 
-Create manifest for the Clinet Deployment  in `k8s\client-deployment.yml`:
+Create manifest for the Client Deployment in `k8s\client-deployment.yml`:
 
 ```yaml
 apiVersion: apps/v1
@@ -617,7 +713,7 @@ Create the Deployment:
 kubectl create -f .\client-deployment.yml
 ```
 
-Verify that ReplicaSet was created:
+Verify that Deployment was created:
 
 ```cmd
 kubectl get deploy/containersdemo-client-deployment
@@ -631,3 +727,27 @@ containersdemo-client-deployment   5         5         5            5           
 ```
 
 Desired and available instance count should match one from the manifest (5).
+
+#### Validation
+
+Examine system logs using `kubectl logs` command.
+To get exact name of a pod, run
+
+```cmd
+kubectl get pods
+```
+
+look for pods with name staring with `containersdemo-client-deployment` and
+`containersdemo-webapi-deployment`. Then run commands
+
+```cmd
+kubectl logs containersdemo-webapi-deployment-<your-id>
+kubectl logs containersdemo-client-deployment-<your-id>
+```
+
+Log output should be similar to examples above for the console apps.
+
+#### Infrastructure
+
+TODO: Deploy ElasticSearch+Kibana and MongoDB to Kubernetes to make this example
+fully self-contained.

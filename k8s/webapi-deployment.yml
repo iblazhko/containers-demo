@@ -20,4 +20,4 @@ spec:
         ports:
         - containerPort: 5000
           protocol: TCP
-          name: containersdemo-webapi-port-po
+          name: webapi-port-po

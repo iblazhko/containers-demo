@@ -10,6 +10,6 @@ spec:
   - port: 5000
     targetPort: 5000
     protocol: TCP
-    name: containersdemo-webapi-port-lb
+    name: webapi-port-lb
   selector:
     app: containersdemo-webapi

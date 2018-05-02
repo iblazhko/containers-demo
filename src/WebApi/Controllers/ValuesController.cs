@@ -16,7 +16,12 @@ namespace WebApi.Controllers
 
         public ValuesController()
         {
-            var mongoClientSettings = new MongoClientSettings();
+            var mongoClientSettings = new MongoClientSettings
+            {
+                Server = new MongoServerAddress(MongoDbConfiguration.ServerAddress, MongoDbConfiguration.ServerPort),
+                MaxConnectionIdleTime = TimeSpan.FromMinutes(1)
+            };
+
             mongoClient = new MongoClient(mongoClientSettings);
             db = mongoClient.GetDatabase(MongoDbConfiguration.DatabaseName);
 
@@ -30,8 +35,8 @@ namespace WebApi.Controllers
         [HttpGet]
         public IEnumerable<IdValuePairType> Get()
         {
-            TraceInformation("GET All"); 
-            
+            TraceInformation("GET All");
+
             var c = db.GetCollection<IdValuePairType>("values");
             return c.Find(Builders<IdValuePairType>.Filter.Empty).ToList();
         }

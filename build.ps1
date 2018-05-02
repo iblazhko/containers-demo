@@ -37,6 +37,8 @@ Write-Host -ForegroundColor Green "*** Clean up existing deployment"
 kubectl delete deploy/containersdemo-client-deployment
 kubectl delete deploy/containersdemo-webapi-deployment
 kubectl delete svc/containersdemo-webapi-service
+kubectl delete svc/containersdemo-mongodb
+kubectl delete svc/containersdemo-containersdemo-elasticsearch
 docker image prune -f
 
 Write-Host -ForegroundColor Green ""
@@ -56,6 +58,8 @@ docker build --tag containers-demo/client:develop .
 Write-Host -ForegroundColor Yellow ""
 Write-Host -ForegroundColor Yellow "***** Kubernetes"
 Set-Location -Path $k8sDir
+kubectl create -f .\elasticsearch-service.yml
+kubectl create -f .\mongodb-service.yml
 kubectl create -f .\webapi-deployment.yml
 kubectl create -f .\webapi-service.yml
 kubectl create -f .\client-deployment.yml

@@ -39,6 +39,7 @@ namespace WebApi
                     .Build();
 
                 TraceInformation($"WebAPI starting at {apiUrl}");
+                TraceInformation($"Using MongoDB at {MongoDbConfiguration.ServerAddress}:{MongoDbConfiguration.ServerPort}/{MongoDbConfiguration.DatabaseName}");
 
                 host.Run();
             }

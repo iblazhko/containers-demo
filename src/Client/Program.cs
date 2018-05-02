@@ -65,7 +65,7 @@ namespace Client
                     }
                     catch (Exception ex)
                     {
-                        TraceError($"Failed to process command {c}: {ex.Message}");                        
+                        TraceError($"Failed to process command {c}: {ex.GetAllMessages()}");                        
                     }                    
                 }
             }
@@ -73,35 +73,37 @@ namespace Client
             // ReSharper disable once FunctionNeverReturns
         }
 
-        private static HttpRequestMessage GetRequest(Command c, string apiUrl)
+        private static HttpRequestMessage GetRequest(Command c, string apiBaseUrl)
         {
+            const string valuesApiUrl = "api/values";
+            
             HttpRequestMessage request;
             switch (c)
             {
                 case Command.GetAll:
-                    request = new HttpRequestMessage(HttpMethod.Get, $"{apiUrl}/values");
+                    request = new HttpRequestMessage(HttpMethod.Get, $"{apiBaseUrl}/{valuesApiUrl}");
                     break;
 
                 case Command.Add:
-                    request = new HttpRequestMessage(HttpMethod.Post, $"{apiUrl}/values") { Content = new StringContent($"{{ \"value\":\"{DateTime.UtcNow}\" }}", Encoding.UTF8, "application/json") };
+                    request = new HttpRequestMessage(HttpMethod.Post, $"{apiBaseUrl}/{valuesApiUrl}") { Content = new StringContent($"{{ \"value\":\"{DateTime.UtcNow}\" }}", Encoding.UTF8, "application/json") };
                     break;
 
                 case Command.GetById:
-                    request = new HttpRequestMessage(HttpMethod.Get, $"{apiUrl}/values/{id}");
+                    request = new HttpRequestMessage(HttpMethod.Get, $"{apiBaseUrl}/{valuesApiUrl}/{id}");
                     break;
 
                 case Command.SetById:
-                    request = new HttpRequestMessage(HttpMethod.Put, $"{apiUrl}/values/{id}") { Content = new StringContent($"{{ \"value\":\"{DateTime.UtcNow}\" }}", Encoding.UTF8, "application/json") };
+                    request = new HttpRequestMessage(HttpMethod.Put, $"{apiBaseUrl}/{valuesApiUrl}/{id}") { Content = new StringContent($"{{ \"value\":\"{DateTime.UtcNow}\" }}", Encoding.UTF8, "application/json") };
                     break;
 
                 case Command.DeleteById:
-                    request = new HttpRequestMessage(HttpMethod.Delete, $"{apiUrl}/values/{id}");
+                    request = new HttpRequestMessage(HttpMethod.Delete, $"{apiBaseUrl}/{valuesApiUrl}/{id}");
                     id = null;
                     break;
 
                 default:
                     TraceError($"Command {c} not supported");
-                    request = new HttpRequestMessage(HttpMethod.Options, $"{apiUrl}");
+                    request = new HttpRequestMessage(HttpMethod.Options, $"{apiBaseUrl}");
                     break;
             }
 
