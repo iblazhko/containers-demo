@@ -401,14 +401,6 @@ we will have a dedicated MongoDB cluster.
 docker run --name containersdemo-mongo -d mongo:latest
 ```
 
-Note that MongoDB .NET driver is compatible with `netstandard1.5` or higher.
-Check `TargetFramework` in project files to make sure that they
-meet this requirement:
-
-```xml
-<TargetFramework>netcoreapp2.0</TargetFramework>
-```
-
 Modify API implementation to use database instead of in-memory dictionary.
 
 ```cmd
@@ -531,8 +523,8 @@ spec:
   externalName: <external hostname or IP>
 ```
 
-For the pods inside the Kubernetes MongoDB will be accessible by hostname
-`containersdemo-mongodb`.
+Pods inside the Kubernetes can use hostname `containersdemo-mongodb`
+to access MongoDB.
 
 Create the Service:
 
@@ -572,8 +564,8 @@ spec:
   externalName: <external hostname or IP>
 ```
 
-For the pods inside the Kubernetes ElasticSearch will be accessible by hostname
-`containersdemo-elasticsearch`.
+Pods inside the Kubernetes can use hostname `containersdemo-elasticsearch`
+to access ElasticSearch.
 
 Create the Service:
 
@@ -687,8 +679,6 @@ Expected output is
 NAME                            TYPE         CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 containersdemo-webapi-service   LoadBalancer ?.?.?.?         <none>        5000:31319/TCP   ???
 ```
-
-Desired and actual instance count should match one from the manifest (3).
 
 #### Client - Deployment
 

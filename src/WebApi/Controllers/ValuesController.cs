@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using static System.Diagnostics.Trace;
@@ -10,8 +9,6 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        private static readonly Dictionary<string, string> repository = new Dictionary<string, string>();
-        private readonly MongoClient mongoClient;
         private readonly IMongoDatabase db;
 
         public ValuesController()
@@ -22,7 +19,7 @@ namespace WebApi.Controllers
                 MaxConnectionIdleTime = TimeSpan.FromMinutes(1)
             };
 
-            mongoClient = new MongoClient(mongoClientSettings);
+            var mongoClient = new MongoClient(mongoClientSettings);
             db = mongoClient.GetDatabase(MongoDbConfiguration.DatabaseName);
 
             var c = db.GetCollection<IdValuePairType>("values");
@@ -31,6 +28,7 @@ namespace WebApi.Controllers
                 db.CreateCollection("values");
             }
         }
+
         // GET api/values
         [HttpGet]
         public IEnumerable<IdValuePairType> Get()
